@@ -16,18 +16,17 @@
 
     - name: Clone boxfuse multistage dockerfile from git
       git:
-        repo: 'https://github.com/ufndtwocmeu/BoxfuseMultistageDocker.git'
-        dest: /data
+        repo: https://github.com/ufndtwocmeu/BoxfuseMultistageDocker.git
+        dest: /data/BoxfuseMultistageDocker
 
     - name: Build image and push it to Dockerhub
       docker_image:
+        name: ufndtwocmeu/myboxfuse:1.0
+        source: build
         build:
           path: /data/BoxfuseMultistageDocker
-        name: ufndtwocmeu/myboxfuse:1.0
         push: yes
-        source: build
-      
-
+        
 - name: Run container from Boxfuse image
   hosts: prod
   become: yes
