@@ -3,7 +3,7 @@
   hosts: builder
   become: yes
 
-tasks:
+  tasks:
     - name: Ensure docker is present
       apt:
         name: docker.io
@@ -32,7 +32,7 @@ tasks:
   hosts: prod
   become: yes
 
-tasks:
+  tasks:
     - name: Ensure docker is present
       apt:
         name: docker.io
