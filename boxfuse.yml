@@ -3,6 +3,11 @@
   hosts: builder
   become: yes
 
+  vars_prompt:
+    - name: dockerhubrepo
+      prompt: "Enter your docker hub repository name to push image to:"
+      private: no
+
   tasks:
     - name: Ensure docker is present
       apt:
@@ -16,17 +21,17 @@
 
     - name: Clone boxfuse multistage dockerfile from git
       git:
-        repo: https://github.com/ufndtwocmeu/BoxfuseMultistageDocker.git
+        repo: https://github.com/{{dockerhubrepo}}/BoxfuseMultistageDocker.git
         dest: /data/BoxfuseMultistageDocker
 
     - name: Build image and push it to Dockerhub
       docker_image:
-        name: ufndtwocmeu/myboxfuse:1.0
-        source: build
         build:
           path: /data/BoxfuseMultistageDocker
+        name: {{dockerhubrepo}}/myboxfuse:1.0
+        source: build
         push: yes
-        
+
 - name: Run container from Boxfuse image
   hosts: prod
   become: yes
@@ -40,5 +45,5 @@
     - name: Run Boxfuse container
       docker_container:
         name: boxfuseprod
-        image: ufndtwocmeu/myboxfuse:1.0
+        image: {{dockerhubrepo}}/myboxfuse:1.0
         published_ports: 8888:8080
