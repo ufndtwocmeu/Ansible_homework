@@ -14,72 +14,32 @@ tasks:
         name: git
         state: present        
 
-    - name: Clone boxfuse dockerfile from git
+    - name: Clone boxfuse multistage dockerfile from git
       git:
-        repo: 'https://github.com/ufndtwocmeu/Gitrepo.git'
+        repo: 'https://github.com/ufndtwocmeu/BoxfuseMultistageDocker.git'
         dest: /data
 
     - name: Build image and push it to Dockerhub
       docker_image:
         build:
-          path: /data/Gitrepo/Ansible_homework
+          path: /data/BoxfuseMultistageDocker
         name: ufndtwocmeu/myboxfuse:1.0
         push: yes
         source: build
       
 
-
-
-
-
-
-
-  - name: build java war
-  hosts: build
-  become: yes
-
-  tasks:
-    - name: ensure maven is present
-      apt:
-        name: maven
-        state: present
-
-    - name: ensure git is present
-      apt:
-        name: git
-        state: present
-
-    - name: clone boxfuse git repository
-      git:
-        repo: 'https://github.com/theplotnikov/homework8.git'
-        dest: /root/
-        clone: no
-
-    - name: build the project
-      shell: mvn -f boxfuse-sample-java-war-hello/pom.xml package
-
-    - name: fetch war to server
-      fetch:
-        src: /root/boxfuse-sample-java-war-hello/target/hello-1.0.war
-        dest: /tmp/
-        flat: yes
-
-- name: run war in prod
+- name: Run container from Boxfuse image
   hosts: prod
   become: yes
 
-  tasks:
-    - name: ensure tomcat is present
+tasks:
+    - name: Ensure docker is present
       apt:
-        name: tomcat9
+        name: docker.io
         state: present
 
-    - name: ensure tomcat is started
-      service:
-        name: tomcat9
-        state: started
-
-    - name: copy war to prod
-      copy:
-        src: /tmp/hello-1.0.war
-        dest: /var/lib/tomcat9/webapps/
+    - name: Run Boxfuse container
+      docker_container:
+        name: boxfuseprod
+        image: ufndtwocmeu/myboxfuse:1.0
+        published_ports: 8888:8080
